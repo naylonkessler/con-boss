@@ -61,7 +61,7 @@ class ReflectorTest extends TestCase
         $this->assertObjectHasAttribute('dependencies', $info);
         $this->assertInternalType('array', $info->dependencies);
         $this->assertCount(3, $info->dependencies);
-        $this->assertNull($info->dependencies[1]);
+        $this->assertEquals('$scalar', $info->dependencies[1]);
         $this->assertEquals(10, $info->dependencies[2]);
 
         return $reflector;

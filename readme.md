@@ -13,6 +13,7 @@ $container->bind('\Some\Interface', '\Some\Class');
 $container->bind('\Another\Interface', function ($container) {
     return new \Some\Class();
 });
+$container->bind('$var', 'Any content');
 $container->share('\Shared\Interface', '\Some\Shared\Class');
 
 $some = $container->get('name');

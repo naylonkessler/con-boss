@@ -24,9 +24,7 @@ class ContainerTest extends TestCase
 
     public function testClassInstance()
     {
-        $reflector = new \ConBoss\Support\Reflector();
-        $resolver = new \ConBoss\Support\Resolver($reflector);
-        $container = new \ConBoss\Container($resolver);
+        $container = new \ConBoss\Container();
 
         $this->assertInstanceOf(\ConBoss\Container::class, $container);
 
@@ -83,6 +81,30 @@ class ContainerTest extends TestCase
 
         return $container;
     }
+
+    /**
+     * @depends testHas
+     */
+    public function testUnbindExists($container)
+    {
+        $this->assertTrue(method_exists($container, 'unbind'));
+
+        return $container;
+    }
+
+    /**
+     * @depends testUnbindExists
+     */
+    public function testUnbind($container)
+    {
+        $container->bind('$unbind', null);
+        $container->unbind('$unbind');
+
+        $this->assertFalse($container->has('$unbind'));
+
+        return $container;
+    }
+
 
     /**
      * @depends testHas
@@ -237,6 +259,20 @@ class ContainerTest extends TestCase
     }
 
     /**
+     * @depends testGetFromInterface
+     */
+    public function testGetFromVariable($container)
+    {
+        $container->bind('$var', 'Some var value');
+
+        $var = $container->get('$var');
+
+        $this->assertEquals('Some var value', $var);
+
+        return $container;
+    }
+
+    /**
      * @depends testGetExists
      */
     public function testGetWithScalarDependencies($container)
@@ -256,6 +292,20 @@ class ContainerTest extends TestCase
     /**
      * @depends testGetWithScalarDependencies
      */
+    public function testGetWithVariableDependencies($container)
+    {
+        $container->bind('$scalar', 'Some value');
+
+        $scalar = $container->get('scalar');
+
+        $this->assertEquals('Some value', $scalar->scalar);
+
+        return $container;
+    }
+
+    /**
+     * @depends testGetWithScalarDependencies
+     */
     public function testGetWithNestedScalarDependencies($container)
     {
         $top = $container->get(\ConBoss\Test\Mock\NestedHasScalar::class);
@@ -263,8 +313,13 @@ class ContainerTest extends TestCase
         $this->assertInstanceOf(\ConBoss\Test\Mock\NestedHasScalar::class, $top);
         $this->assertInstanceOf(\ConBoss\Test\Mock\HasScalar::class, $top->hasScalar);
         $this->assertInstanceOf(\ConBoss\Test\Mock\Another::class, $top->another);
-        $this->assertNull($top->hasScalar->scalar);
+        $this->assertEquals('Some value', $top->hasScalar->scalar);
         $this->assertEquals(10, $top->hasScalar->defaults);
+
+        $container->unbind('$scalar');
+        $top = $container->get(\ConBoss\Test\Mock\NestedHasScalar::class);
+
+        $this->assertNull($top->hasScalar->scalar);
 
         return $container;
     }

@@ -4,7 +4,7 @@ namespace ConBoss;
 
 use StdClass;
 
-use ConBoss\Support\Resolver;
+use ConBoss\Support\Reflector;
 
 /**
  * Container class of ConBoss.
@@ -15,37 +15,42 @@ class Container
 {
     /**
      * Collection of registered bindings.
+     *
      * @var array
      */
     protected $bindings = [];
 
     /**
-     * An instance of resolver.
-     * @var \ConBoss\Support\Resolver
+     * An instance of reflector.
+     *
+     * @var \ConBoss\Support\Reflector
      */
-    protected $resolver = null;
+    protected $reflector = null;
 
     /**
      * Collection of shared instances.
+     *
      * @var array
      */
     protected $shared = [];
 
     /**
      * Container constructor.
-     * @param  \ConBoss\Support\Resolver  $resolver
+     *
+     * @param  \ConBoss\Support\Reflector  $reflector
      */
-    public function __construct(Resolver $resolver = null)
+    public function __construct(Reflector $reflector = null)
     {
-        if ( ! $resolver) {
-            $resolver = new Resolver();
+        if ( ! $reflector) {
+            $reflector = new Reflector();
         }
 
-        $this->resolver = $resolver;
+        $this->reflector = $reflector;
     }
 
     /**
      * Register a bind on container.
+     *
      * @param  string  $source  Source name of binding
      * @param  mixed  $target  Target to resolve the binding
      * @param  boolean  $shared  If binding is shared
@@ -54,6 +59,7 @@ class Container
     public function bind($source, $target, $shared = false)
     {
         $binding = new StdClass();
+        $binding->name = $source;
         $binding->shared = $shared;
         $binding->target = $target;
 
@@ -64,6 +70,7 @@ class Container
 
     /**
      * Get the result of a resolved binding from container.
+     *
      * @param  mixed  $source  Source name for get
      * @return mixed
      */
@@ -80,6 +87,7 @@ class Container
 
     /**
      * Check if container has a binding.
+     *
      * @param  string  $source  Source name for check
      * @return boolean
      */
@@ -90,6 +98,7 @@ class Container
 
     /**
      * Register a shared bind on container.
+     *
      * @param  string  $source  Source name of binding
      * @param  mixed  $target  Target to resolve the binding
      * @return \ConBoss\Container
@@ -100,7 +109,23 @@ class Container
     }
 
     /**
+     * Unregister a bind on container.
+     *
+     * @param  string  $source  Source name of binding
+     * @return \ConBoss\Container
+     */
+    public function unbind($source)
+    {
+        if ($this->has($source)) {
+            unset($this->bindings[$source]);
+        }
+
+        return $this;
+    }
+
+    /**
      * Return a binding info for a received source.
+     *
      * @param  mixed  $source  Source name of binding
      * @return \StdClass
      */
@@ -109,6 +134,7 @@ class Container
         if ($this->has($source)) return $this->bindings[$source];
 
         $binding = new StdClass();
+        $binding->name = $source;
         $binding->shared = false;
         $binding->target = $source;
 
@@ -116,7 +142,50 @@ class Container
     }
 
     /**
+     * Resolve a received target from callable.
+     *
+     * @param  mixed  $target  Target to resolve
+     * @return mixed
+     */
+    protected function fromCallable($target)
+    {
+        return call_user_func($target, $this);
+    }
+
+    /**
+     * Resolve a received target from string.
+     *
+     * @param  mixed  $target  Target to resolve
+     * @return mixed
+     */
+    protected function fromString($target)
+    {
+        $info = $this->reflector->infoOf($target);
+        $arguments = [];
+
+        foreach ($info->dependencies as $dependency) {
+            $arguments[] = $this->get($dependency);
+        }
+
+        return $this->reflector->newOf($target, $arguments);
+    }
+
+    /**
+     * Resolve a received binding for a variable.
+     *
+     * @param  \StdClass  $variable  Binding to resolve
+     * @return mixed
+     */
+    protected function fromVariable(StdClass $binding)
+    {
+        if ( ! $this->has($binding->name)) return null;
+
+        return $binding->target;
+    }
+
+    /**
      * Get the result of a resolved binding for one source.
+     *
      * @param  mixed  $one  Source name for get
      * @return mixed
      */
@@ -128,7 +197,7 @@ class Container
 
         if ($returnShared) return $this->shared[$one];
 
-        $instance = $this->resolver->resolve($binding->target, $this);
+        $instance = $this->resolve($binding);
 
         if ($binding->shared) {
             $this->shared[$one] = $instance;
@@ -139,11 +208,48 @@ class Container
 
     /**
      * Check if container has a shared instance.
+     *
      * @param  string  $source  Source name for check
      * @return boolean
      */
     protected function hasShared($source)
     {
         return array_key_exists($source, $this->shared);
+    }
+
+    /**
+     * Check if reveived target if a variable.
+     *
+     * @param  string  $target  Target to check
+     * @return boolean
+     */
+    protected function isTargetVariable($target)
+    {
+        return is_string($target) && $target[0] === '$';
+    }
+
+    /**
+     * Resolve a received binding.
+     *
+     * @param  StdClass  $binding  Binding to resolve
+     * @return mixed
+     */
+    protected function resolve(StdClass $binding)
+    {
+        $instance = $binding->target;
+
+        if ($this->isTargetVariable($binding->name)) {
+            return $this->fromVariable($binding);
+        }
+
+        if (is_string($binding->target)) {
+            return $this->fromString($binding->target);
+        }
+
+        if (is_callable($binding->target)) {
+            return $this->fromCallable($binding->target);
+        }
+
+        return $instance;
     }
 }

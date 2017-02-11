@@ -16,6 +16,7 @@ class Reflector
 {
     /**
      * Return info about some received target.
+     *
      * @param  string  $target  A target to grab info
      * @return \StdClass
      */
@@ -32,6 +33,7 @@ class Reflector
 
     /**
      * Return new instance of received target.
+     *
      * @param  string  $target  A target to instantiate
      * @param  array  $args  Arguments for instance
      * @return mixed
@@ -45,6 +47,7 @@ class Reflector
 
     /**
      * Return the parameters of received target.
+     *
      * @param  string  $target  A target to grab parameters
      * @return array
      */
@@ -59,6 +62,7 @@ class Reflector
 
     /**
      * Return info about a single received parameter.
+     *
      * @param  ReflectionParameter  $param  A parameter object to inspect
      * @return mixed
      */
@@ -71,6 +75,6 @@ class Reflector
 
         if ($hasDefault) return $param->getDefaultValue();
 
-        return null;
+        return '$'.$param->getName();
     }
 }
