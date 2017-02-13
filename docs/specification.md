@@ -12,7 +12,8 @@ Is commonly used to associate an interface with a concret class.
 - Bind a name to a fully qualified class name;
 - Bind a fully qualified interface name to a fully qualified class name;
 - Bind a name to a closure;
-- Bind a fully qualified interface name to a closure.
+- Bind a fully qualified interface name to a closure;
+- Bind a variable.
 
 ## Sharing
 
@@ -33,4 +34,5 @@ The resolving is the process that dependencies are resolved to return a concret 
 
 - Resolve a bind chain;
 - Return a single instance;
-- Return multiple instances.
+- Return multiple instances;
+- Return a variable.

@@ -6,8 +6,6 @@ use ReflectionClass;
 use ReflectionParameter;
 use StdClass;
 
-use ConBoss\Container;
-
 /**
  * Reflector support class of ConBoss.
  * The reflector acts like a wrapper for some reflection operations.

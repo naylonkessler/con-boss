@@ -161,11 +161,8 @@ class Container
     protected function fromString($target)
     {
         $info = $this->reflector->infoOf($target);
-        $arguments = [];
 
-        foreach ($info->dependencies as $dependency) {
-            $arguments[] = $this->get($dependency);
-        }
+        $arguments = array_map([$this, 'oneFromString'], $info->dependencies);
 
         return $this->reflector->newOf($target, $arguments);
     }
@@ -226,6 +223,17 @@ class Container
     protected function isTargetVariable($target)
     {
         return is_string($target) && $target[0] === '$';
+    }
+
+    /**
+     * Mapper function for resolution from string.
+     *
+     * @param  mixed  $dependency  Some dependency to get
+     * @return mixed
+     */
+    protected function oneFromString($dependency)
+    {
+        return $this->get($dependency);
     }
 
     /**
