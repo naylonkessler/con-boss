@@ -1,5 +1,7 @@
 # ConBoss
 
+![SensioLabs Insight badge](https://insight.sensiolabs.com/projects/cc7bb22a-38bc-40ac-8b59-2fb74ca4b50a/big.png)
+
 ConBoss is a light context manager (container) for using with dependency injection and inversion of control concepts. It is intended to be simple and light but still powerful.
 
 ## Installation
