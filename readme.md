@@ -48,9 +48,31 @@ $container->share(Shared\Interface::class, Some\Shared\Class::class);
 And finally request some bind from container:
 
 ```php
-// Return some bind name from container
+// Get some bind name from container
 $some = $container->get('name');
 
-// Return some variable from container
+// Get some variable from container
 $var = $container->get('$varName');
+
+// Get multiple values from container
+list($name, $var) = $container->get(['name', '$varName']);
+```
+
+You can also unbind something from container and check if some binding exists:
+
+```php
+// Unbind a name from container
+$container->unbind('name');
+
+// Check if some bind exists
+$exists = $container->has('name');
+```
+
+Except for `Container::get()` and `Container::has()` methods that returns especific values you can take advantage of chained calls if you prefer:
+
+```php
+// Chained calls
+$container->share('some-shared', Some\Shared::class)
+    ->bind('some-bind', Some\Bind::class)
+    ->bind('$someVar', 10);
 ```
