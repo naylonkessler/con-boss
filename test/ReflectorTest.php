@@ -2,10 +2,10 @@
 
 namespace ConBoss\Test;
 
-include_once 'mock/Some.php';
-include_once 'mock/Another.php';
-include_once 'mock/Main.php';
-include_once 'mock/HasScalar.php';
+include_once 'dummy/Some.php';
+include_once 'dummy/Another.php';
+include_once 'dummy/Main.php';
+include_once 'dummy/HasScalar.php';
 
 use PHPUnit\Framework\TestCase;
 

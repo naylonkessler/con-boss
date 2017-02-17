@@ -2,16 +2,16 @@
 
 namespace ConBoss\Test;
 
-include_once 'mock/Some.php';
-include_once 'mock/Another.php';
-include_once 'mock/Main.php';
-include_once 'mock/Unbound.php';
-include_once 'mock/LevelTop.php';
-include_once 'mock/LevelSecond.php';
-include_once 'mock/LevelThird.php';
-include_once 'mock/AnInterface.php';
-include_once 'mock/HasScalar.php';
-include_once 'mock/NestedHasScalar.php';
+include_once 'dummy/Some.php';
+include_once 'dummy/Another.php';
+include_once 'dummy/Main.php';
+include_once 'dummy/Unbound.php';
+include_once 'dummy/LevelTop.php';
+include_once 'dummy/LevelSecond.php';
+include_once 'dummy/LevelThird.php';
+include_once 'dummy/AnInterface.php';
+include_once 'dummy/HasScalar.php';
+include_once 'dummy/NestedHasScalar.php';
 
 use PHPUnit\Framework\TestCase;
 
